@@ -55,6 +55,7 @@
     "./dist/marqy.css": "./dist/marqy.css"
   },
   "scripts": {
+    "prepare": "vite build",
     "build": "vite build",
     "watch": "vite build --watch",
     "install:examples": "yarn --cwd examples install",
