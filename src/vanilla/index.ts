@@ -10,7 +10,7 @@ export type { MarqyDirection }
 const CLONES = 2
 
 export class MarqyElement extends HTMLElement {
-  static observedAttributes = ['speed', 'direction', 'pause-on-hover', 'manual']
+  static observedAttributes = ['speed', 'direction', 'pause-on-hover', 'manual', 'adapt-to-content']
 
   private _cleanupContainer: (() => void) | null = null
   private _cleanupItem: (() => void) | null = null
@@ -36,6 +36,10 @@ export class MarqyElement extends HTMLElement {
     return this.hasAttribute('manual')
   }
 
+  private get _adaptToContent() {
+    return this.hasAttribute('adapt-to-content')
+  }
+
   private get _isVertical() {
     return this._direction === 'up' || this._direction === 'down'
   }
@@ -54,42 +58,59 @@ export class MarqyElement extends HTMLElement {
     if (this._inner) this._update()
   }
 
-  private _render() {
-    this.setAttribute('data-marqy', '')
+  private _setHostAttrs() {
     this.setAttribute('data-direction', this._direction)
     if (this._pauseOnHover) {
       this.setAttribute('data-pause-on-hover', '')
     } else {
       this.removeAttribute('data-pause-on-hover')
     }
+    if (this._adaptToContent) {
+      this.setAttribute('data-adapt-to-content', '')
+    } else {
+      this.removeAttribute('data-adapt-to-content')
+    }
+  }
+
+  private _render() {
+    this.setAttribute('data-marqy', '')
+    this._setHostAttrs()
 
     this._inner = document.createElement('div')
     this._inner.setAttribute('data-marqy-inner', '')
 
-    for (let clone = 0; clone < CLONES; clone++) {
-      const content = document.createElement('div')
-      content.setAttribute('data-marqy-content', '')
-      this._inner.appendChild(content)
-    }
-
     this.innerHTML = ''
     this.appendChild(this._inner)
-    this._buildItems()
+    this._buildStructure()
   }
 
-  private _buildItems() {
+  private _buildStructure() {
     if (!this._inner) return
-    const contents = this._inner.querySelectorAll<HTMLElement>('[data-marqy-content]')
-    contents.forEach((content, clone) => {
-      content.innerHTML = ''
-      for (let rep = 0; rep < this._reps; rep++) {
-        const item = document.createElement('div')
-        item.setAttribute('data-marqy-item', '')
-        if (clone !== 0 || rep !== 0) item.setAttribute('aria-hidden', 'true')
-        item.innerHTML = this._slotHTML
-        content.appendChild(item)
+    this._inner.innerHTML = ''
+
+    if (this._adaptToContent && this._reps > 1) {
+      const content = document.createElement('div')
+      content.setAttribute('data-marqy-content', '')
+      const item = document.createElement('div')
+      item.setAttribute('data-marqy-item', '')
+      item.innerHTML = this._slotHTML
+      content.appendChild(item)
+      this._inner.appendChild(content)
+    } else {
+      for (let clone = 0; clone < CLONES; clone++) {
+        const content = document.createElement('div')
+        content.setAttribute('data-marqy-content', '')
+        for (let rep = 0; rep < this._reps; rep++) {
+          const item = document.createElement('div')
+          item.setAttribute('data-marqy-item', '')
+          if (clone !== 0 || rep !== 0) item.setAttribute('aria-hidden', 'true')
+          item.innerHTML = this._slotHTML
+          content.appendChild(item)
+        }
+        this._inner.appendChild(content)
       }
-    })
+    }
+
     this._applyDuration()
   }
 
@@ -116,7 +137,7 @@ export class MarqyElement extends HTMLElement {
     const newReps = calcReps(cSize, iSize)
     if (newReps !== this._reps) {
       this._reps = newReps
-      this._buildItems()
+      this._buildStructure()
       this._reObserveItem()
     } else {
       this._applyDuration()
@@ -136,6 +157,7 @@ export class MarqyElement extends HTMLElement {
 
   private _applyDuration() {
     if (!this._inner) return
+    if (this._adaptToContent && this._reps > 1) return
     const duration = calcAnimationDuration(
       this._isVertical ? this._itemDims.height : this._itemDims.width,
       this._reps,
@@ -154,13 +176,9 @@ export class MarqyElement extends HTMLElement {
   }
 
   private _update() {
-    this.setAttribute('data-direction', this._direction)
-    if (this._pauseOnHover) {
-      this.setAttribute('data-pause-on-hover', '')
-    } else {
-      this.removeAttribute('data-pause-on-hover')
-    }
-    this._applyDuration()
+    this._setHostAttrs()
+    this._buildStructure()
+    this._reObserveItem()
   }
 
   private _cleanup() {

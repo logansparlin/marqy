@@ -14,6 +14,7 @@ export interface MarqyProps extends React.ComponentPropsWithoutRef<'div'> {
   direction?: MarqyDirection
   pauseOnHover?: boolean
   manual?: boolean
+  adaptToContent?: boolean
   children: React.ReactNode
 }
 
@@ -22,6 +23,7 @@ export function Marqy({
   direction = 'left',
   pauseOnHover,
   manual = false,
+  adaptToContent = false,
   children,
   ...rest
 }: MarqyProps): React.ReactElement {
@@ -52,10 +54,15 @@ export function Marqy({
       data-marqy=""
       data-direction={direction}
       data-pause-on-hover={pauseOnHover ? '' : null}
+      data-adapt-to-content={adaptToContent ? '' : null}
       {...rest}
     >
       <div data-marqy-inner="">
-        {new Array(2).fill(0).map((_, clone) => (
+        {reps > 1 && adaptToContent ? (
+          <div data-marqy-content="">
+            <div data-marqy-item="" ref={item}>{children}</div>
+          </div>
+        ) : new Array(2).fill(0).map((_, clone) => (
           <div
             key={clone}
             data-marqy-content=""

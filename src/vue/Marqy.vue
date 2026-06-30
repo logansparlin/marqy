@@ -12,6 +12,7 @@ interface Props {
   direction?: MarqyDirection
   pauseOnHover?: boolean
   manual?: boolean
+  adaptToContent?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -19,6 +20,7 @@ const props = withDefaults(defineProps<Props>(), {
   direction: 'left',
   pauseOnHover: false,
   manual: false,
+  adaptToContent: false,
 })
 
 const containerRef = ref<HTMLElement | null>(null)
@@ -72,29 +74,37 @@ onUnmounted(() => {
     data-marqy=""
     :data-direction="direction"
     :data-pause-on-hover="pauseOnHover ? '' : undefined"
+    :data-adapt-to-content="adaptToContent ? '' : undefined"
     v-bind="$attrs"
   >
     <div data-marqy-inner="">
-      <div
-        v-for="clone in [0, 1]"
-        :key="clone"
-        data-marqy-content=""
-        v-bind="
-          manual
-            ? { 'data-marqy-static': animationDuration }
-            : { style: `animation-duration: ${animationDuration}` }
-        "
-      >
-        <div
-          v-for="rep in Array.from({ length: reps }, (_, i) => i)"
-          :key="rep"
-          :ref="(el) => { if (clone === 0 && rep === 0) itemRef = el as HTMLElement | null }"
-          :aria-hidden="!(clone === 0 && rep === 0) || undefined"
-          data-marqy-item=""
-        >
+      <div v-if="reps > 1 && adaptToContent" data-marqy-content="">
+        <div :ref="(el) => { itemRef = el as HTMLElement | null }" data-marqy-item="">
           <slot />
         </div>
       </div>
+      <template v-else>
+        <div
+          v-for="clone in [0, 1]"
+          :key="clone"
+          data-marqy-content=""
+          v-bind="
+            manual
+              ? { 'data-marqy-static': animationDuration }
+              : { style: `animation-duration: ${animationDuration}` }
+          "
+        >
+          <div
+            v-for="rep in Array.from({ length: reps }, (_, i) => i)"
+            :key="rep"
+            :ref="(el) => { if (clone === 0 && rep === 0) itemRef = el as HTMLElement | null }"
+            :aria-hidden="!(clone === 0 && rep === 0) || undefined"
+            data-marqy-item=""
+          >
+            <slot />
+          </div>
+        </div>
+      </template>
     </div>
   </div>
 </template>

@@ -54,6 +54,7 @@ const props = [
   { name: 'direction', type: "'left' | 'right' | 'up' | 'down'", default: "'left'", description: 'Direction of scroll' },
   { name: 'pauseOnHover', type: 'boolean', default: 'false', description: 'Pauses the animation on hover' },
   { name: 'manual', type: 'boolean', default: 'false', description: 'Renders without applying CSS animations' },
+  { name: 'adaptToContent', type: 'boolean', default: 'false', description: 'Renders as static if content does not overflow' },
   { name: 'children', type: 'React.ReactNode', default: '—', description: 'Content to repeat inside the marqy' },
 ]
 ---

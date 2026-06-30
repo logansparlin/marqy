@@ -46,13 +46,14 @@ import 'marqy/dist/marqy.css';
 
 ### Properties
 
-| Name           | Type                            | Description                               |
-| -------------- | ------------------------------- | ----------------------------------------- |
-| `speed`        | number **[default: 0.5]**       | Scroll speed multiplier                   |
-| `direction`    | string **[default: 'left']**    | Direction of scroll                       |
-| `pauseOnHover` | boolean **[default: false]**    | Pauses the animation on hover             |
-| `manual`       | boolean **[default: false]**    | Renders without applying CSS animations   |
-| `children`     | React.ReactNode                 | Content to repeat inside the marqy        |
+| Name           | Type                            | Description                                    |
+| -------------- | ------------------------------- | ---------------------------------------------- |
+| `speed`        | number **[default: 0.5]**       | Scroll speed multiplier                        |
+| `direction`    | string **[default: 'left']**    | Direction of scroll                            |
+| `pauseOnHover` | boolean **[default: false]**    | Pauses the animation on hover                  |
+| `manual`       | boolean **[default: false]**    | Renders without applying CSS animations        |
+| `adaptToContent` | boolean **[default: false]**  | Renders as static if content does not overflow |
+| `children`     | React.ReactNode                 | Content to repeat inside the marqy             |
 
 ### License
 

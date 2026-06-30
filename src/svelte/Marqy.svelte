@@ -12,6 +12,7 @@
     direction?: MarqyDirection
     pauseOnHover?: boolean
     manual?: boolean
+    adaptToContent?: boolean
     children: Snippet
     [key: string]: unknown
   }
@@ -21,6 +22,7 @@
     direction = 'left' as MarqyDirection,
     pauseOnHover = false,
     manual = false,
+    adaptToContent = false,
     children,
     ...rest
   }: Props = $props()
@@ -67,26 +69,35 @@
   data-marqy=""
   data-direction={direction}
   data-pause-on-hover={pauseOnHover ? '' : undefined}
+  data-adapt-to-content={adaptToContent ? '' : undefined}
   {...rest}
 >
   <div data-marqy-inner="">
-    {#each [0, 1] as clone}
-      <div
-        data-marqy-content=""
-        {...manual
-          ? { 'data-marqy-static': animationDuration }
-          : { style: `animation-duration: ${animationDuration}` }}
-      >
-        {#each Array.from({ length: reps }, (_, i) => i) as rep}
-          <div
-            use:observeFirstItem={clone === 0 && rep === 0}
-            aria-hidden={!(clone === 0 && rep === 0) || undefined}
-            data-marqy-item=""
-          >
-            {@render children()}
-          </div>
-        {/each}
+    {#if reps > 1 && adaptToContent}
+      <div data-marqy-content="">
+        <div use:observeFirstItem={true} data-marqy-item="">
+          {@render children()}
+        </div>
       </div>
-    {/each}
+    {:else}
+      {#each [0, 1] as clone}
+        <div
+          data-marqy-content=""
+          {...manual
+            ? { 'data-marqy-static': animationDuration }
+            : { style: `animation-duration: ${animationDuration}` }}
+        >
+          {#each Array.from({ length: reps }, (_, i) => i) as rep}
+            <div
+              use:observeFirstItem={clone === 0 && rep === 0}
+              aria-hidden={!(clone === 0 && rep === 0) || undefined}
+              data-marqy-item=""
+            >
+              {@render children()}
+            </div>
+          {/each}
+        </div>
+      {/each}
+    {/if}
   </div>
 </div>

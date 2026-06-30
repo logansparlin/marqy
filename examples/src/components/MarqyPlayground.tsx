@@ -61,6 +61,7 @@ export default function MarqyPlayground() {
   const [pauseOnHover, setPauseOnHover] = useState(false)
   const [manual, setManual] = useState(false)
   const [showXRay, setShowXRay] = useState(false)
+  const [adaptToContent, setAdaptToContent] = useState(false)
 
   const [gsapEnabled, setGsapEnabled] = useState(false)
 
@@ -316,6 +317,12 @@ export default function MarqyPlayground() {
                 value: showXRay,
                 onChange: setShowXRay,
               },
+              {
+                name: 'adaptToContent',
+                label: 'adaptToContent',
+                value: adaptToContent,
+                onChange: setAdaptToContent
+              }
             ].map(({ name, label, subLabel, value, onChange }) => (
               <label
                 key={name}
@@ -421,6 +428,7 @@ export default function MarqyPlayground() {
               speed={speed}
               pauseOnHover={pauseOnHover}
               manual={manual || gsapEnabled}
+              adaptToContent={adaptToContent}
               className={cn('select-none', {
                 'h-(--height) grow': isVertical,
                 'overflow-visible! [&_[data-marqy-content]:last-child]:text-purple/20 [&_[data-marqy-content]:last-child]:[-webkit-text-stroke:1px_var(--color-purple)]':
